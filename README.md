@@ -28,3 +28,12 @@ You can choose a specific name for your repository, if you don't want a random o
 ```
 python manage.py create_repo --name=myrepo --password=123
 ```
+
+### Delete a repository
+
+In the root of *ez2share*, the following command deletes a repository. A name is required.
+This command also delete the uploaded files.
+
+```
+python manage.py delete_repo --name=myrepo
+```
