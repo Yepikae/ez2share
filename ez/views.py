@@ -1,10 +1,12 @@
 from django.shortcuts import render
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from .models import Repository
-from .forms import PasswordForm
+from .models import Repository, Files
+from .forms import PasswordForm, FileFieldForm
+from django.views.generic.edit import FormView
+import time
 
 def upload(request, name):
     # if this is a POST request we need to process the form data
@@ -17,11 +19,11 @@ def upload(request, name):
             # ...
             # redirect to a new URL:
             password = form['repository_password'].value()
-            print(password)
-            print(name)
             user = authenticate(username=name, password=password)
             if user is not None:
-                return render(request, 'ez/upload.html', {})
+                login(request, user)
+                form = FileFieldForm()
+                return render(request, 'ez/upload.html', {'form': form})
             else:
                 raise PermissionDenied
 
@@ -31,3 +33,32 @@ def upload(request, name):
     return render(request,
                   'ez/ask_for_connection.html',
                   {'name': name, 'view': 'upload', 'form': form})
+
+
+def upload_files(request):
+    user = request.user
+    if not user.is_authenticated:
+        raise PermissionDenied
+    else:
+        logout(request)
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = FileFieldForm(request.POST, request.FILES)
+        # check whether it's valid:
+        if form.is_valid():
+            # Save the files & return json
+            files = request.FILES.getlist('file_field')
+            repository = Repository.objects.get(owner=user)
+            for file in files:
+                f = Files(repository=repository, file=file)
+                f.save()
+            return JsonResponse({'success': True})
+        else:
+            raise PermissionDenied
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        raise PermissionDenied
+
+def upload_complete(request):
+    return render(request, 'ez/upload_complete.html', {})

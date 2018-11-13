@@ -1,4 +1,31 @@
 {% extends "ez/base.html" %}
 {% block content %}
-Coucou
+<form id="form" action="/ajax/upload_files/" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form }}
+    <input type="button" onclick='_onsubmit()' value="Submit">
+</form>
+
+<progress id="progress" value="0" max="100">70 %</progress>
+
+<script>
+
+function _onsubmit(){
+  var formElement = document.getElementById('form');
+  var xhr = new XMLHttpRequest();
+  xhr.upload.addEventListener("progress", function(evt){
+      if (evt.lengthComputable) {
+        var progress =  evt.loaded / evt.total * 100;
+        document.getElementById('progress').value = progress;
+      }
+    }, false);
+  xhr.onloadend = function (e) {
+    window.location = "/upload_complete";
+  }
+  xhr.open("post", formElement.action);
+  xhr.send(new FormData(formElement));
+}
+
+
+</script>
 {% endblock %}
