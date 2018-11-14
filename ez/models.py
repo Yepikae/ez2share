@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
+import os
 
 class Repository(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -13,3 +14,7 @@ def user_directory_path(instance, filename):
 class Files(models.Model):
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE)
     file = models.FileField(upload_to=user_directory_path)
+
+    @property
+    def filename(self):
+        return os.path.basename(self.file.name)

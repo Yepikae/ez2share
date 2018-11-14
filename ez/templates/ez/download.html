@@ -1,0 +1,10 @@
+{% extends "ez/base.html" %}
+{% block content %}
+<form id="form" action="/ajax/download_files/" method="post">
+  {% csrf_token %}
+  {% for id, name in files %}
+    <input type="checkbox" name="download" value={{id}}>{{name}}</input> <br/>
+  {% endfor %}
+<input type="submit" value="Submit">
+</form>
+{% endblock %}
