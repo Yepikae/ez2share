@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from .models import Repository, Files
 from .forms import PasswordForm, FileFieldForm
 from django.views.generic.edit import FormView
+from django import forms
 import time
 import os
 import zipfile
@@ -13,6 +14,7 @@ from io import BytesIO
 
 
 def upload(request, name):
+    context = {}
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
@@ -29,14 +31,15 @@ def upload(request, name):
                 form = FileFieldForm()
                 return render(request, 'ez/upload.html', {'form': form})
             else:
-                raise PermissionDenied
+                context['form'] = PasswordForm()
+                context['error_message'] = 'Password incorrect.'
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = PasswordForm()
-    return render(request,
-                  'ez/ask_for_connection.html',
-                  {'name': name, 'view': 'upload', 'form': form})
+        context['form'] = PasswordForm()
+    context['name'] = name
+    context['view'] = 'upload'
+    return render(request, 'ez/ask_for_connection.html', context)
 
 def upload_files(request):
     user = request.user
