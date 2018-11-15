@@ -11,7 +11,10 @@ import time
 import os
 import zipfile
 from io import BytesIO
+import pprint
 
+def error_404_view(request, exception):
+    return render(request,'errors/404.html', {})
 
 def upload(request, name):
     # raise 404 if repo does not exist
