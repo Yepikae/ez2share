@@ -9,6 +9,7 @@
 __pycache__/
 migrations/
 uploads/
+/static/
 local_settings.py
 db.sqlite3
 media
