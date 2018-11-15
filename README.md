@@ -12,6 +12,9 @@ Then, clone this project.
 git clone https://github.com/Yepikae/ez2share.git
 ```
 
+## Using a server
+
+For uwsgi & nginx, follow [this tutorial](https://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html)
 
 ## Use
 
