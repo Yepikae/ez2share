@@ -14,6 +14,11 @@ from io import BytesIO
 
 
 def upload(request, name):
+    # raise 404 if repo does not exist
+    try:
+        Repository.objects.get(owner__username=name)
+    except Repository.DoesNotExist:
+        raise Http404("Repository does not exist.")
     context = {}
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
