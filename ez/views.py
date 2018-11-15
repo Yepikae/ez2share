@@ -1,10 +1,10 @@
 from django.shortcuts import render
-from django.http import Http404, JsonResponse, HttpResponse
+from django.http import Http404, JsonResponse, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from .models import Repository, Files
-from .forms import PasswordForm, FileFieldForm
+from .forms import PasswordForm, RepoForm, FileFieldForm
 from django.views.generic.edit import FormView
 from django import forms
 import time
@@ -70,6 +70,29 @@ def upload_files(request):
     # if a GET (or any other method) we'll create a blank form
     else:
         raise PermissionDenied
+
+def ask_for_repo(request, view='upload'):
+    context = {}
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = RepoForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            repo_name = form['repository_name'].value()
+            try:
+                Repository.objects.get(owner__username=repo_name)
+                return HttpResponseRedirect(repo_name)
+            except Repository.DoesNotExist:
+                context['error_message'] = 'Repository does not exist.'
+
+    # if a GET (or any other method) we'll create a blank form
+    context['form'] = RepoForm()
+    context['view'] = view
+    return render(request, 'ez/ask_for_repo.html', context)
 
 def upload_complete(request):
     return render(request, 'ez/upload_complete.html', {})
