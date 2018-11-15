@@ -1,0 +1,103 @@
+{% extends "ez/base.html" %}
+{% load static %}
+{% block content %}
+<style>
+  #login-container {
+    background: linear-gradient(217deg, rgba(144, 164, 174, .8), rgba(144, 164, 174, 0) 70.71%),
+                linear-gradient(127deg, rgba(69, 90, 100, .8), rgba(69, 90, 100, 0) 70.71%),
+                linear-gradient(336deg, rgba(189,189,189,.8), rgba(189,189,189,0) 70.71%);
+
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+  }
+
+  input[type=text]{
+    background: transparent;
+    outline: none;
+    border: none;
+    border-bottom: solid 1px grey;
+    height: 30px;
+  }
+
+  input[type=submit]{
+    background-color: rgba(255,255,255,0.7);
+    height: 30px;
+    border: none;
+    border-radius: 2px;
+    padding-left: 10pt;
+    padding-right: 10pt;
+    -webkit-transition: background-color 0.25s ease-in-out;
+    transition: background-color 0.25s ease-in-out;
+  }
+
+  input[type=submit]:hover{
+    background-color: rgba(255,255,255,0.9);
+    cursor: pointer;
+  }
+
+  #form{
+    margin: 0 auto;
+  }
+
+  #login-name{
+    color: #C2185B;
+    font-family: arial;
+  }
+
+  #title{
+    font-family: 'Geo', sans-serif;
+    font-weight: normal;
+    font-size: 38px;
+    padding-bottom: 2pt;
+    border-bottom: solid 1px grey;
+    width: 100%;
+  }
+
+  #sub-title{
+    font-family: 'Open sans', sans-serif;
+    font-weight: normal;
+    font-size: 20px;
+    margin-bottom: 15pt;
+  }
+
+  .alert{
+    color: #D32F2F;
+  }
+
+  #id_repository_name{
+    width: 100%;
+  }
+
+  #submit-button{
+    float: right;
+    margin-top: 5pt;
+  }
+
+</style>
+
+<div id="login-container" class="row center-xs middle-xs">
+  <div class="col-xs-9 col-sm-7 col-md-5 col-lg-3">
+    <div class="row start-xs">
+      <div class="col-xs-12">
+        <div class="box">
+          <div id="title"><span>Ez 2 Share</span></div>
+          <div id="sub-title">Go to <span id="login-name">:</span></div>
+
+          <form id="form" action="/{{view}}/" method="post">
+            {% csrf_token %}
+            <input type="text" id="id_repository_name" name="repository_name" placeholder="Repository name">
+            <input id="submit-button" type="submit" value="Connect">
+          </form>
+
+          {% if error_message %}
+            <small class="alert">{{error_message}}</small>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
