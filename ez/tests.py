@@ -25,7 +25,6 @@ class RepositoryCommandTests(TestCase):
         out = StringIO()
         # Create a first repo.
         call_command('create_repo', password='abc', name='john', stdout=out)
-        self.assertEqual(out.getvalue(), 'Ok\n')
         user = User.objects.filter(username='john').first()
         self.assertIsNotNone(user)
         repo = Repository.objects.filter(owner=user).first()
@@ -34,7 +33,6 @@ class RepositoryCommandTests(TestCase):
         out = StringIO()
         # Create the same repo
         call_command('create_repo', password='abc', name='john', stdout=out)
-        self.assertEqual(out.getvalue(), 'Name already taken\n')
         users = User.objects.filter(username='john').count()
         self.assertEqual(users, 1)
         repos = Repository.objects.filter(owner=user).count()
@@ -43,7 +41,6 @@ class RepositoryCommandTests(TestCase):
         out = StringIO()
         # Create a new repo
         call_command('create_repo', password='abc', name='john2', stdout=out)
-        self.assertEqual(out.getvalue(), 'Ok\n')
         users = User.objects.filter(username='john2').count()
         self.assertEqual(users, 1)
         repos = Repository.objects.count()
@@ -52,7 +49,6 @@ class RepositoryCommandTests(TestCase):
         out = StringIO()
         # Create a new random repo
         call_command('create_repo', password='abc', stdout=out)
-        self.assertEqual(out.getvalue(), 'Ok\n')
         users = User.objects.count()
         self.assertEqual(users, 3)
         repos = Repository.objects.count()
@@ -61,7 +57,6 @@ class RepositoryCommandTests(TestCase):
         out = StringIO()
         # Create a repo without password
         call_command('create_repo', stdout=out)
-        self.assertEqual(out.getvalue(), 'Password required\n')
         users = User.objects.count()
         self.assertEqual(users, 3)
         repos = Repository.objects.count()
@@ -70,7 +65,6 @@ class RepositoryCommandTests(TestCase):
         out = StringIO()
         # Create a repo without password
         call_command('create_repo', name='john3', stdout=out)
-        self.assertEqual(out.getvalue(), 'Password required\n')
         users = User.objects.count()
         self.assertEqual(users, 3)
         repos = Repository.objects.count()

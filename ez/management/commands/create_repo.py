@@ -1,8 +1,22 @@
 from django.core.management.base import BaseCommand, CommandError
 from ez.models import Repository
 from django.contrib.auth.models import User
+from django.conf import settings
 import random
 import string
+import os
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    TAB = '  '
+    DOUBLETAB = '    '
 
 class Command(BaseCommand):
     help = 'Creates a new repository.'
@@ -21,7 +35,11 @@ class Command(BaseCommand):
         # Retrieve password. If there's none, exit.
         password = options['password']
         if password is None:
-            return "Password required"
+            msg = bcolors.FAIL + 'Error:' + bcolors.ENDC
+            msg += ' command needs a ' + bcolors.BOLD + 'password ' + bcolors.ENDC + 'entry.'
+            msg += 'Try --help.'
+            print( msg )
+            return ''
         # Retrieve name. Id there's none, create a unique random one.
         name = options['name']
         if name is None:
@@ -36,11 +54,17 @@ class Command(BaseCommand):
                 name = _create_name(self.name_length)
         else:
             if User.objects.filter(username=name).first() is not None:
-                return "Name already taken"
+                print( bcolors.FAIL + 'Error:' + bcolors.ENDC + ' name already taken.' )
+                return ''
         # Create the user bound to the repository
         user = User.objects.create_user(name, '', password)
         user.save()
-        # Finally create the repository
+        # Create the repository
         repository = Repository(owner=user)
         repository.save()
-        return "Ok"
+        # Finally, create the target folder
+        os.makedirs(settings.UPLOAD_DIR+name)
+        msg = bcolors.OKGREEN + 'Success:' +bcolors.ENDC
+        msg += ' repository ' + bcolors.BOLD + name + bcolors.ENDC + ' created !'
+        print( msg )
+        return ''
