@@ -133,7 +133,7 @@ def download(request, name):
 def download_files(request):
     user = request.user
     if not user.is_authenticated:
-        raise PermissionDenied
+        return HttpResponseRedirect('/download/')
     else:
         logout(request)
     # if this is a POST request we need to process the form data
@@ -154,4 +154,4 @@ def download_files(request):
         return response
     # if a GET (or any other method) we'll create a blank form
     else:
-        raise PermissionDenied
+        return HttpResponseRedirect('/download/')

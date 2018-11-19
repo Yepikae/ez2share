@@ -1,10 +1,162 @@
 {% extends "ez/base.html" %}
+{% load static %}
 {% block content %}
-<form id="form" action="/ajax/download_files/" method="post">
-  {% csrf_token %}
-  {% for id, name in files %}
-    <input type="checkbox" name="download" value={{id}}>{{name}}</input> <br/>
-  {% endfor %}
-<input type="submit" value="Submit">
-</form>
+
+<style>
+  #upload-container {
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+  }
+
+  #form{
+    margin: 0 auto;
+  }
+
+  #title{
+    font-family: 'Geo', sans-serif;
+    font-weight: normal;
+    font-size: 38px;
+    padding-bottom: 2pt;
+    border-bottom: solid 1px grey;
+    width: 100%;
+  }
+
+  #sub-title{
+    font-family: 'Open sans', sans-serif;
+    font-weight: normal;
+    font-size: 20px;
+    margin-bottom: 15pt;
+  }
+
+  #submit-button{
+    float: right;
+    margin-top: 5pt;
+  }
+
+  img{
+    width: 36px;
+    opacity: 0.3;
+  }
+
+  .item-div{
+    position: relative;
+    border: solid 1px grey;
+    margin: 2px;
+    padding: 1px;
+    border-radius: 5px;
+    display: inline-block;
+    -webkit-transition: border-color 0.25s ease-in-out, color 0.25s ease-in-out;
+    transition: border-color 0.25s ease-in-out, color 0.25s ease-in-out;
+  }
+
+  .item-div > input{
+    margin: 0;
+    display: none;
+  }
+
+  .item-div img{
+    margin-left: 10px;
+    vertical-align: bottom;
+  }
+
+  .item-div:hover{
+    border-color: #E91E63;
+  }
+
+  .selected{
+    border-color: #C2185B;
+    color: #C2185B;
+  }
+
+  #select-all-button{
+    position: relative;
+    border: solid 1px grey;
+    margin: 2px;
+    padding: 1px;
+    border-radius: 5px;
+    display: inline-block;
+    -webkit-transition: border-color 0.25s ease-in-out;
+    transition: border-color 0.25s ease-in-out;
+  }
+
+  #select-all-button:hover{
+    border-color: #E91E63;
+  }
+
+  .select-all::before{ content:"Select all"; }
+
+  .deselect-all::before{ content:"Deselect all"; }
+
+</style>
+
+<div id="upload-container" class="row center-xs">
+  <div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+    <div class="row start-xs">
+      <div class="col-xs-12">
+        <div class="box">
+          <div id="title"><span>Ez 2 Share</span></div>
+            <div id="select-all-button" class="select-all clickable"></div>
+            <form id="form" action="/ajax/download_files/" method="post">
+              {% csrf_token %}
+              <div>
+              {% for id, name in files %}
+                <div class="item-div clickable">
+                  <input type="checkbox" name="download" value={{id}}></input>
+                  {{name}}
+                  <img src='{% static "ez/images/picture.svg" %}'></img>
+                </div>
+              {% endfor %}
+              </div>
+            <input id="submit-button" type="submit" value="Download">
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  function _selectAll(isOn){
+    if(isOn){
+      $('.item-div').addClass('selected');
+      $('.item-div').find('input').attr('checked', 'checked');
+    }
+    else{
+      $('.item-div').find('input').removeAttr('checked');
+      $('.item-div').removeClass('selected');
+    }
+  }
+
+  $( document ).ready(function() {
+
+      $('#select-all-button').on('click', function(){
+        var shouldSelect = $(this).hasClass('select-all');
+        if(shouldSelect){
+          $(this).addClass('deselect-all');
+          $(this).removeClass('select-all');
+          _selectAll(true);
+        }
+        else{
+          $(this).addClass('select-all');
+          $(this).removeClass('deselect-all');
+          _selectAll(false);
+        }
+      })
+
+      $('.item-div').on('click', function(){
+        var checked = $(this).find('input').attr('checked');
+        if(checked === undefined){
+          $(this).find('input').attr('checked', 'checked');
+          $(this).addClass('selected');
+        }
+        else{
+          $(this).find('input').removeAttr('checked');
+          $(this).removeClass('selected');
+        }
+      });
+  });
+</script>
 {% endblock %}
