@@ -18,12 +18,18 @@ body * {
 
 /* INPUTS =================================================== */
 
-input[type=password]{
+input[type=password], input[type=text]{
   background: transparent;
   outline: none;
   border: none;
   border-bottom: solid 1px grey;
   height: 30px;
+  -webkit-transition: border-color 0.25s ease-in-out;
+  transition: border-color 0.25s ease-in-out;
+}
+
+input[type=text]:focus, input[type=password]:focus{
+  border-color: #C2185B;
 }
 
 input[type=submit]{
