@@ -8,6 +8,14 @@ body{
   width: 100vw;
 }
 
+body * {
+  box-sizing: border-box;
+}
+
+.clickable{
+  cursor: pointer;
+}
+
 /* INPUTS =================================================== */
 
 input[type=password]{
@@ -43,4 +51,13 @@ input[type=submit]:hover{
 
 .text-magenta{
   color: #C2185B;
+}
+
+.text-magenta-hover{
+  -webkit-transition: color 0.25s ease-in-out;
+  transition: color 0.25s ease-in-out;
+}
+
+.text-magenta-hover:hover{
+  color: #E91E63;
 }

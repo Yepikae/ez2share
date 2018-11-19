@@ -1,22 +1,135 @@
 {% extends "ez/base.html" %}
 {% block content %}
-<form id="form" action="/ajax/upload_files/" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form }}
-    <input type="button" onclick='_onsubmit()' value="Submit">
-</form>
 
-<progress id="progress" value="0" max="100">70 %</progress>
+<style>
+  #login-container {
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+  }
 
+  #form{
+    margin: 0 auto;
+  }
+
+  #title{
+    font-family: 'Geo', sans-serif;
+    font-weight: normal;
+    font-size: 38px;
+    padding-bottom: 2pt;
+    border-bottom: solid 1px grey;
+    width: 100%;
+  }
+
+  #sub-title{
+    font-family: 'Open sans', sans-serif;
+    font-weight: normal;
+    font-size: 20px;
+    margin-bottom: 15pt;
+  }
+
+  #id_repository_name{
+    width: 100%;
+  }
+
+  #submit-button{
+    float: right;
+    margin-top: 5pt;
+  }
+
+  #id_file_field{
+    display: none;
+  }
+
+  #drop-area{
+    font-size: 14px;
+    height: 100px;
+    width: 100%;
+    background: repeating-linear-gradient(
+      135deg,
+      rgba(255,255,255,0.1),
+      rgba(255,255,255,0.1) 4px,
+      rgba(255,255,255,0.2) 4px,
+      rgba(255,255,255,0.2) 8px
+    );
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: dashed 1px grey;
+    text-align: center;
+    padding-top: 36px;
+  }
+
+  #progress{
+    width: 0%;
+    height: 10px;
+    background-color: #C2185B;
+    -webkit-transition: width 0.25s ease-in-out;
+    transition: width 0.25s ease-in-out;
+  }
+
+  #progress-div{
+    border-bottom: solid 1px grey;
+  }
+
+  #submit-button{
+    float: right;
+  }
+
+  #progress-percent{
+    display: none;
+    float: right;
+  }
+
+</style>
+
+<div id="login-container" class="row center-xs middle-xs">
+  <div class="col-xs-9 col-sm-7 col-md-5 col-lg-3">
+    <div class="row start-xs">
+      <div class="col-xs-12">
+        <div class="box">
+          <div id="title"><span>Ez 2 Share</span></div>
+          <form id="form" action="/ajax/upload_files/" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div id="drop-area">
+                <span id="click-to-upload" class="text-magenta text-magenta-hover clickable">Choose your files</span>
+                <span>...or drop them here !</span>
+              </div>
+              <div id="progress-div">
+                <div id="progress"></div>
+              </div>
+              <input type="file" id="id_file_field" name="fiel_field" multiple="">
+              <input id="submit-button" type="button" onclick='_onsubmit()' value="Submit">
+              <div id="progress-percent"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 
+$( document ).ready(function() {
+    $('#click-to-upload').on('click', function(){
+      $('#id_file_field').click();
+    });
+});
+
+function _hide_submit_button(){
+  $('#submit-button').css('display', 'none');
+  $('#progress-percent').css('display', 'block');
+}
+
 function _onsubmit(){
+  _hide_submit_button();
+
   var formElement = document.getElementById('form');
   var xhr = new XMLHttpRequest();
   xhr.upload.addEventListener("progress", function(evt){
       if (evt.lengthComputable) {
         var progress =  evt.loaded / evt.total * 100;
-        document.getElementById('progress').value = progress;
+        $('#progress').css('width', progress+'%');
+        $('#progress-percent').text(Math.round(progress)+'%');
       }
     }, false);
   xhr.onloadend = function (e) {
