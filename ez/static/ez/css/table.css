@@ -1,0 +1,21 @@
+table{
+  width: 100%;
+}
+
+thead{
+  text-align: left;
+  line-height: 26px;
+}
+
+thead th {
+  border-bottom: solid 1px gray;
+}
+
+td{
+  padding: 10px 0 10px;
+  font-size: 14px;
+}
+
+tr:nth-child(2n){
+  background-color: rgba(255, 255, 255, 0.1);
+}

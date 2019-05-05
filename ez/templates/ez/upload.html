@@ -1,6 +1,9 @@
 {% extends "ez/base.html" %}
+{% load static %}
 {% block content %}
 
+<script src="https://transloadit.edgly.net/releases/uppy/v1.0.0/uppy.min.js"></script>
+<link href="https://transloadit.edgly.net/releases/uppy/v1.0.0/uppy.min.css" rel="stylesheet">
 <style>
   #upload-container {
     height: 100vh;
@@ -33,112 +36,67 @@
     width: 100%;
   }
 
-  #submit-button{
-    float: right;
-    margin-top: 5pt;
-  }
-
-  #id_file_field{
-    display: none;
-  }
-
-  #drop-area{
-    font-size: 14px;
-    height: 100px;
-    width: 100%;
-    background: repeating-linear-gradient(
-      135deg,
-      rgba(255,255,255,0.1),
-      rgba(255,255,255,0.1) 4px,
-      rgba(255,255,255,0.2) 4px,
-      rgba(255,255,255,0.2) 8px
-    );
-    margin-top: 10px;
-    margin-bottom: 10px;
-    border: dashed 1px grey;
-    text-align: center;
-    padding-top: 36px;
-  }
-
-  #progress{
-    width: 0%;
-    height: 10px;
-    background-color: #C2185B;
-    -webkit-transition: width 0.25s ease-in-out;
-    transition: width 0.25s ease-in-out;
-  }
-
-  #progress-div{
-    border-bottom: solid 1px grey;
-  }
-
-  #submit-button{
-    float: right;
-  }
-
-  #progress-percent{
-    display: none;
-    float: right;
-  }
-
 </style>
 
 <div id="upload-container" class="row center-xs middle-xs">
-  <div class="col-xs-9 col-sm-7 col-md-5 col-lg-3">
+  <div class="col-xs-8">
     <div class="row start-xs">
       <div class="col-xs-12">
-        <div class="box">
-          <div id="title"><span>Ez 2 Share</span></div>
-          <form id="form" action="/ajax/upload_files/" method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              <div id="drop-area">
-                <span id="click-to-upload" class="text-magenta text-magenta-hover clickable">Choose your files</span>
-                <span>...or drop them here !</span>
-              </div>
-              <div id="progress-div">
-                <div id="progress"></div>
-              </div>
-              <input type="file" id="id_file_field" name="file_field" multiple="">
-              <input id="submit-button" type="button" onclick='_onsubmit()' value="Submit">
-              <div id="progress-percent"></div>
-          </form>
-        </div>
+        <div id="title"><span>Ez 2 Share</span></div>
+        <input id="username" value="" placeholder="your name, optional."></input>
+        <div id="drop-zone"></div>
       </div>
     </div>
   </div>
 </div>
+
 <script>
-
-$( document ).ready(function() {
-    $('#click-to-upload').on('click', function(){
-      $('#id_file_field').click();
-    });
-});
-
-function _hide_submit_button(){
-  $('#submit-button').css('display', 'none');
-  $('#progress-percent').css('display', 'block');
-}
-
-function _onsubmit(){
-  _hide_submit_button();
-
-  var formElement = document.getElementById('form');
-  var xhr = new XMLHttpRequest();
-  xhr.upload.addEventListener("progress", function(evt){
-      if (evt.lengthComputable) {
-        var progress =  evt.loaded / evt.total * 100;
-        $('#progress').css('width', progress+'%');
-        $('#progress-percent').text(Math.round(progress)+'%');
-      }
-    }, false);
-  xhr.onloadend = function (e) {
-    window.location = "/upload_complete";
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
   }
-  xhr.open("post", formElement.action);
-  xhr.send(new FormData(formElement));
-}
+  var csrftoken = getCookie('csrftoken');
 
+  var uppy = Uppy.Core()
+  uppy.use(Uppy.Dashboard, {
+    trigger: '.UppyModalOpenerBtn',
+    inline: true,
+    target: '#drop-zone',
+    replaceTargetContent: true,
+    showProgressDetails: true,
+    note: 'Images only.',
+    height: 470,
+    width: "100%",
+    restrictions: {
+      maxFileSize: 20000000,
+      allowedFileTypes: ['image/*', '.jpg', '.jpeg', '.png', '.gif']
+    },
+    browserBackButtonClose: true
+  })
 
+  uppy.use(Uppy.XHRUpload, {
+    endpoint: '/ajax/upload_files/',
+    headers: {
+      'X-CSRFToken': csrftoken
+    },
+    metaFields: ['username'],
+  })
+
+  uppy.on('file-added', (file) => {
+    uppy.setFileMeta(file.id, {
+      username: $('#username').val()
+    })
+  })
 </script>
 {% endblock %}

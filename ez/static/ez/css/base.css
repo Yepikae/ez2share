@@ -67,3 +67,7 @@ input[type=submit]:hover{
 .text-magenta-hover:hover{
   color: #E91E63;
 }
+
+.align-right{
+  text-align: right;
+}

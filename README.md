@@ -12,6 +12,19 @@ Then, clone this project.
 git clone https://github.com/Yepikae/ez2share.git
 ```
 
+Now, we need to start the database.
+```
+cd ez2share
+python manage.py migrate
+python manage.py makemigrations
+python manage.py migrate
+```
+
+Finally, collect the static files
+```
+python manage.py collectstatic
+```
+
 ## Using a server
 
 For uwsgi & nginx, follow [this tutorial](https://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html)

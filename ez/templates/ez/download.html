@@ -114,21 +114,29 @@
       <div class="col-xs-12">
         <div class="box">
           <div id="title"><span>Ez 2 Share</span></div>
-            <div id="select-all-button" class="select-all menu-button clickable"></div>
-            <div id="filter-selected-button" class="menu-button clickable">Filter selected</div>
-            <div id="filter-not-selected-button" class="menu-button clickable">Filter not selected</div>
             <input id="search-input" type="text" placeholder="Search" value=""></input>
             <form id="form" action="/ajax/download_files/" method="post">
               {% csrf_token %}
-              <div>
-              {% for id, name in files %}
-                <div class="item-div clickable" data-name="{{name}}">
-                  <input type="checkbox" name="download" value={{id}}></input>
-                  {{name}}
-                  <img src='{% static "ez/images/picture.svg" %}'></img>
-                </div>
-              {% endfor %}
-              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>File</th>
+                    <th>Uploader Name</th>
+                    <th>Deposit date</th>
+                    <th class="align-right"><input type="checkbox" id="select-all" onclick="_selectAll()"></input></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for id, name, created_at, username in files %}
+                    <tr class="item-tr" data-name="{{name}}" data-user="{{username}}">
+                      <td>{{name}}</td>
+                      <td>{{username}}</td>
+                      <td>{{created_at}}</td>
+                      <td class="align-right"><input type="checkbox" name="download" value={{id}}></input></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             <input id="submit-button" type="submit" value="Download">
           </form>
         </div>
@@ -139,62 +147,25 @@
 
 <script>
 
-  function _selectAll(isOn){
+  function _selectAll(){
+    let isOn = $('#select-all').is(':checked');
     if(isOn){
-      $('.item-div').addClass('selected');
-      $('.item-div').find('input').attr('checked', 'checked');
+      $('.item-tr:not(.hide)').find('input').prop('checked', true);
     }
     else{
-      $('.item-div').find('input').removeAttr('checked');
-      $('.item-div').removeClass('selected');
+      $('.item-tr:not(.hide)').find('input').prop('checked', false);
     }
   }
 
   function _filterItems(filter){
     var filter = filter;
-    $('.item-div').removeClass('hide');
-    $('.item-div').filter(function( index ) {
-      return $(this).data('name').indexOf(filter) === -1;
+    $('.item-tr').removeClass('hide');
+    $('.item-tr').filter(function( index ) {
+      return $(this).data('name').indexOf(filter) === -1 && $(this).data('user').indexOf(filter) === -1;
     }).addClass('hide');
   }
 
   $( document ).ready(function() {
-
-      $('#filter-not-selected-button').on('click', function(){
-        var isActive = $(this).hasClass('selected');
-        if(isActive){
-          $(this).removeClass('selected');
-          $('.item-div').removeClass('hide');
-        }
-        else{
-          // Toggle the other filter if it is active first
-          if( $('#filter-selected-button').hasClass('selected') ){
-            $('#filter-selected-button').click();
-          }
-          $(this).addClass('selected');
-          $('.item-div').filter(function( index ) {
-            return $(this).hasClass('selected');
-          }).addClass('hide');
-        }
-      })
-
-      $('#filter-selected-button').on('click', function(){
-        var isActive = $(this).hasClass('selected');
-        if(isActive){
-          $(this).removeClass('selected');
-          $('.item-div').removeClass('hide');
-        }
-        else{
-          // Toggle the other filter if it is active first
-          if( $('#filter-not-selected-button').hasClass('selected') ){
-            $('#filter-not-selected-button').click();
-          }
-          $(this).addClass('selected');
-          $('.item-div').filter(function( index ) {
-            return !$(this).hasClass('selected');
-          }).addClass('hide');
-        }
-      })
 
       $('#search-input').on('keyup', function(){
         var value = $(this).val();
@@ -204,32 +175,6 @@
       $('#search-input').on('change', function(){
         var value = $(this).val();
         _filterItems(value);
-      });
-
-      $('#select-all-button').on('click', function(){
-        var shouldSelect = $(this).hasClass('select-all');
-        if(shouldSelect){
-          $(this).addClass('deselect-all');
-          $(this).removeClass('select-all');
-          _selectAll(true);
-        }
-        else{
-          $(this).addClass('select-all');
-          $(this).removeClass('deselect-all');
-          _selectAll(false);
-        }
-      });
-
-      $('.item-div').on('click', function(){
-        var checked = $(this).find('input').attr('checked');
-        if(checked === undefined){
-          $(this).find('input').attr('checked', 'checked');
-          $(this).addClass('selected');
-        }
-        else{
-          $(this).find('input').removeAttr('checked');
-          $(this).removeClass('selected');
-        }
       });
   });
 </script>

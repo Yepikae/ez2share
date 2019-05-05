@@ -53,23 +53,15 @@ def upload_files(request):
     user = request.user
     if not user.is_authenticated:
         raise PermissionDenied
-    else:
-        logout(request)
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = FileFieldForm(request.POST, request.FILES)
-        # check whether it's valid:
-        if form.is_valid():
-            # Save the files & return json
-            files = request.FILES.getlist('file_field')
-            repository = Repository.objects.get(owner=user)
-            for file in files:
-                f = Files(repository=repository, file=file)
-                f.save()
-            return JsonResponse({'success': True})
-        else:
-            raise PermissionDenied
+        username = request.POST.get('username')
+        files = request.FILES.getlist('files[]')
+        repository = Repository.objects.get(owner=user)
+        for file in files:
+            f = Files(repository=repository, file=file, username=username)
+            f.save()
+        return JsonResponse({'success': True})
     # if a GET (or any other method) we'll create a blank form
     else:
         raise PermissionDenied
@@ -118,7 +110,7 @@ def download(request, name):
                 raw_files = Files.objects.filter(repository=repository)
                 files = []
                 for file in raw_files:
-                    files.append((file.id, file.filename))
+                    files.append((file.id, file.filename, file.created_at, file.username))
                 return render(request, 'ez/download.html', {'files': files})
             else:
                 raise PermissionDenied
